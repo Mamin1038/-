@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>해커스 토플 보카 단어장 & 시험지</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+        .hide-text { filter: blur(6px); user-select: none; transition: filter 0.2s; }
+        .hide-text:hover { filter: none; }
+    </style>
+</head>
+<body class="bg-white text-black min-h-screen flex flex-col border-t-4 border-black">
+
+    <!-- Header -->
+    <header class="border-b-2 border-black py-4 px-4 sm:px-8 flex flex-col sm:flex-row justify-between items-center gap-4">
+        <div>
+            <h1 class="text-xl sm:text-2xl font-black tracking-tight">HACKERS TOEFL VOCABULARY</h1>
+            <p class="text-xs text-gray-600 font-bold">DAY 1 & DAY 2 단어장 및 모의 시험지</p>
+        </div>
+        <div class="flex gap-2 w-full sm:w-auto">
+            <button onclick="switchTab('list')" id="btn-list" class="flex-1 sm:flex-none px-5 py-2.5 bg-black text-white font-bold rounded border border-black cursor-pointer text-sm">단어장 보기</button>
+            <button onclick="switchTab('test')" id="btn-test" class="flex-1 sm:flex-none px-5 py-2.5 bg-white text-black font-bold rounded border border-black hover:bg-gray-100 transition cursor-pointer text-sm">시험 보기</button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 max-w-4xl w-full mx-auto p-4 sm:p-6">
+
+        <!-- 1. 단어장 탭 -->
+        <section id="tab-list" class="space-y-6">
+            <!-- 옵션 바 -->
+            <div class="bg-gray-50 p-4 border-2 border-black rounded space-y-3">
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <input type="text" id="search-input" placeholder="단어, 뜻, 동의어 검색..." onkeyup="filterWords()" class="px-3 py-2 border-2 border-black rounded text-sm w-full bg-white focus:outline-none">
+                    <div class="flex gap-2 shrink-0">
+                        <button onclick="filterDay('all')" class="day-btn px-3 py-2 bg-black text-white font-bold text-xs rounded border border-black cursor-pointer">전체</button>
+                        <button onclick="filterDay(1)" class="day-btn px-3 py-2 bg-white text-black font-bold text-xs rounded border border-black cursor-pointer">Day 1</button>
+                        <button onclick="filterDay(2)" class="day-btn px-3 py-2 bg-white text-black font-bold text-xs rounded border border-black cursor-pointer">Day 2</button>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4 pt-1 text-sm font-bold border-t border-gray-300">
+                    <label class="flex items-center gap-1.5 cursor-pointer">
+                        <input type="checkbox" id="hide-meaning" onchange="toggleMask()" class="w-4 h-4 border-2 border-black">
+                        <span>한국어 뜻 가리기</span>
+                    </label>
+                    <label class="flex items-center gap-1.5 cursor-pointer">
+                        <input type="checkbox" id="hide-synonym" onchange="toggleMask()" class="w-4 h-4 border-2 border-black">
+                        <span>동의어 가리기</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- 단어 리스트 -->
+            <div id="word-list-container" class="space-y-3">
+                <!-- JS 렌더링 -->
+            </div>
+        </section>
+
+        <!-- 2. 시험지 탭 -->
+        <section id="tab-test" class="hidden space-y-6">
+            <!-- 설정 화면 -->
+            <div id="test-setup" class="border-2 border-black p-6 rounded space-y-5 bg-white">
+                <h2 class="text-xl font-black border-b-2 border-black pb-2">시험 설정</h2>
+                
+                <div class="space-y-2">
+                    <label class="block font-bold text-sm">1. 범위 선택</label>
+                    <div class="flex gap-4">
+                        <label class="flex items-center gap-2 cursor-pointer text-sm font-semibold">
+                            <input type="radio" name="test-day" value="all" checked class="w-4 h-4"> 전체 (Day 1 + Day 2)
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer text-sm font-semibold">
+                            <input type="radio" name="test-day" value="1" class="w-4 h-4"> Day 1
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer text-sm font-semibold">
+                            <input type="radio" name="test-day" value="2" class="w-4 h-4"> Day 2
+                        </label>
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="block font-bold text-sm">2. 문항 수 선택</label>
+                    <div class="flex gap-3">
+                        <label class="flex items-center gap-1.5 cursor-pointer text-sm font-semibold">
+                            <input type="radio" name="test-count" value="10" checked class="w-4 h-4"> 10문항
+                        </label>
+                        <label class="flex items-center gap-1.5 cursor-pointer text-sm font-semibold">
+                            <input type="radio" name="test-count" value="20" class="w-4 h-4"> 20문항
+                        </label>
+                        <label class="flex items-center gap-1.5 cursor-pointer text-sm font-semibold">
+                            <input type="radio" name="test-count" value="30" class="w-4 h-4"> 30문항
+                        </label>
+                        <label class="flex items-center gap-1.5 cursor-pointer text-sm font-semibold">
+                            <input type="radio" name="test-count" value="all" class="w-4 h-4"> 전체 문항
+                        </label>
+                    </div>
+                </div>
+
+                <button onclick="generatePaper()" class="w-full py-3 bg-black text-white font-black text-base rounded hover:bg-gray-800 cursor-pointer">시험지 생성하기</button>
+            </div>
+
+            <!-- 시험지 화면 -->
+            <div id="test-paper" class="hidden border-2 border-black p-4 sm:p-8 rounded space-y-8 bg-white">
+                <div class="border-b-2 border-black pb-4 text-center space-y-1">
+                    <h2 class="text-2xl font-black tracking-widest">VOCABULARY TEST SHEET</h2>
+                    <p class="text-xs font-bold text-gray-500">각 단어의 뜻과 핵심 동의어를 알맞게 작성하세요.</p>
+                </div>
+
+                <form id="quiz-form" class="space-y-8" onsubmit="submitPaper(event)">
+                    <div id="paper-questions-container" class="space-y-8">
+                        <!-- JS로 문제 생성 -->
+                    </div>
+
+                    <button type="submit" class="w-full py-4 bg-black text-white font-black text-lg rounded hover:bg-gray-800 cursor-pointer shadow">
+                        답안 제출 및 채점하기
+                    </button>
+                </form>
+            </div>
+
+            <!-- 결과 화면 -->
+            <div id="test-result" class="hidden border-2 border-black p-6 rounded text-center space-y-4 bg-white">
+                <h2 class="text-2xl font-black">채점 결과</h2>
+                <p id="final-score" class="text-xl font-bold"></p>
+                <div id="result-detail" class="text-left space-y-2 max-h-96 overflow-y-auto border p-3 border-gray-300 rounded text-sm"></div>
+                <button onclick="resetTest()" class="px-6 py-2.5 bg-black text-white font-bold rounded cursor-pointer">다시 시험 보기</button>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        // 표제어 및 뜻 데이터 (구분자 '/' 로 다의어 설정)
+        const vocabData = [
+            // Day 1
+            { day: 1, word: "exploit", meanings: ["(부당하게) 이용하다"], synonyms: ["utilize", "use", "take advantage of"] },
+            { day: 1, word: "account for", meanings: ["설명하다", "차지하다", "원인이 되다"], synonyms: ["explain", "comprise", "cause"] },
+            { day: 1, word: "particular", meanings: ["특정한", "특별한"], synonyms: ["specific", "special", "distinct"] },
+            { day: 1, word: "prominent", meanings: ["눈에 띄는", "중요한"], synonyms: ["conspicuous", "remarkable", "important"] },
+            { day: 1, word: "replenish", meanings: ["보충하다"], synonyms: ["refill", "restore", "renew"] },
+            { day: 1, word: "indigenous", meanings: ["토착의"], synonyms: ["native", "aboriginal", "local"] },
+            { day: 1, word: "pinpoint", meanings: ["정확히 찾아내다", "정확한"], synonyms: ["locate exactly", "precise", "accurate"] },
+            { day: 1, word: "annihilate", meanings: ["전멸시키다"], synonyms: ["destroy", "completely remove", "exterminate"] },
+            { day: 1, word: "conversely", meanings: ["반대로"], synonyms: ["on the other hand", "contrarily", "inversely"] },
+            { day: 1, word: "investigate", meanings: ["조사하다"], synonyms: ["examine", "inquire into", "look into"] },
+            { day: 1, word: "assure", meanings: ["확신시키다", "보장하다"], synonyms: ["convince", "persuade", "guarantee"] },
+            { day: 1, word: "entire", meanings: ["전체의", "전부의"], synonyms: ["whole", "total", "complete"] },
+            { day: 1, word: "compensate for", meanings: ["보상하다", "상쇄하다"], synonyms: ["make up for", "atone for", "balance"] },
+            { day: 1, word: "postulate", meanings: ["가정하다", "주장하다"], synonyms: ["hypothesize", "suppose", "claim"] },
+            { day: 1, word: "magnify", meanings: ["확대하다"], synonyms: ["enlarge", "increase", "amplify"] },
+            { day: 1, word: "afford", meanings: ["주다", "제공하다"], synonyms: ["give", "offer", "provide"] },
+            { day: 1, word: "conclusive", meanings: ["결정적인", "확실한"], synonyms: ["definitive", "final", "clear"] },
+            { day: 1, word: "unsophisticated", meanings: ["단순한", "복잡하지 않은"], synonyms: ["simple", "uncomplicated", "plain"] },
+            { day: 1, word: "justified", meanings: ["정당한"], synonyms: ["right", "legitimate", "reasonable"] },
+            { day: 1, word: "deliberate", meanings: ["의도적인", "신중한"], synonyms: ["intentional", "planned", "careful"] },
+            { day: 1, word: "depend on", meanings: ["의존하다", "의지하다"], synonyms: ["rely on", "count on", "resort to"] },
+            { day: 1, word: "substantiate", meanings: ["입증하다"], synonyms: ["confirm", "prove", "verify"] },
+            { day: 1, word: "successively", meanings: ["잇따라서"], synonyms: ["one after another", "sequentially", "consecutively"] },
+            { day: 1, word: "pervasive", meanings: ["퍼지는", "만연하는"], synonyms: ["widespread", "prevalent", "extending"] },
+            { day: 1, word: "strenuous", meanings: ["격렬한", "힘든"], synonyms: ["intense", "arduous", "laborious"] },
+            { day: 1, word: "sleek", meanings: ["매끄러운"], synonyms: ["smooth", "silky", "glossy"] },
+            { day: 1, word: "invoke", meanings: ["빌다", "기원하다"], synonyms: ["call upon", "pray to", "apply"] },
+            { day: 1, word: "impressive", meanings: ["인상적인", "대단한"], synonyms: ["striking", "remarkable", "extraordinary"] },
+            { day: 1, word: "conjunction", meanings: ["결합"], synonyms: ["combination", "union", "junction"] },
+            { day: 1, word: "astoundingly", meanings: ["몹시 놀랍게도"], synonyms: ["incredibly", "surprisingly", "astonishingly"] },
+            { day: 1, word: "aftermath", meanings: ["여파", "결과"], synonyms: ["result", "outcome", "consequence"] },
+            { day: 1, word: "promptly", meanings: ["신속하게", "즉시"], synonyms: ["quickly", "instantly", "straightaway"] },
+            { day: 1, word: "subdue", meanings: ["정복하다"], synonyms: ["defeat", "conquer", "vanquish"] },
+            { day: 1, word: "extant", meanings: ["현존하는"], synonyms: ["surviving", "existing", "remaining"] },
+            { day: 1, word: "sedentary", meanings: ["주로 앉아 있는", "정착성의"], synonyms: ["stationary", "settled", "inactive"] },
+            { day: 1, word: "eliminate", meanings: ["없애다", "제거하다"], synonyms: ["get rid of", "remove", "discard"] },
+            { day: 1, word: "perfect", meanings: ["개선하다", "완벽하게 하다"], synonyms: ["refine", "improve", "develop"] },
+            { day: 1, word: "genuine", meanings: ["진짜의", "성실한"], synonyms: ["true", "real", "authentic"] },
+            { day: 1, word: "dominant", meanings: ["우세한", "주요한"], synonyms: ["prevailing", "prominent", "chief"] },
+            { day: 1, word: "unrivaled", meanings: ["비할 데 없는"], synonyms: ["unequaled", "unparalleled", "matchless"] },
+            { day: 1, word: "paradox", meanings: ["모순된 말"], synonyms: ["contradiction", "absurdity", "inconsistency"] },
+            { day: 1, word: "neglect", meanings: ["무시하다", "잊다"], synonyms: ["ignore", "disregard", "fail"] },
+            { day: 1, word: "recall", meanings: ["상기하다", "생각해내다"], synonyms: ["remember", "recollect", "retrace"] },
+            { day: 1, word: "ascend", meanings: ["올라가다"], synonyms: ["rise", "climb", "mount"] },
+            { day: 1, word: "solid", meanings: ["확고한", "견고한"], synonyms: ["substantial", "fixed", "sturdy"] },
+            { day: 1, word: "contour", meanings: ["윤곽", "외형"], synonyms: ["outline", "profile", "shape"] },
+            { day: 1, word: "inhabit", meanings: ["거주하다"], synonyms: ["live in", "occupy", "dwell in"] },
+            { day: 1, word: "irrevocably", meanings: ["돌이킬 수 없게"], synonyms: ["permanently", "irreversibly", "irretrievably"] },
+            { day: 1, word: "superficially", meanings: ["표면적으로"], synonyms: ["apparently", "externally", "on the surface"] },
+            { day: 1, word: "stunted", meanings: ["발달이 저해된"], synonyms: ["underdeveloped", "hindered", "hampered"] },
+            { day: 1, word: "malleable", meanings: ["두들겨 펼 수 있는", "유연한"], synonyms: ["flexible", "pliable", "adaptable"] },
+            { day: 1, word: "mean", meanings: ["의미하다", "평균"], synonyms: ["signify", "express", "average"] },
+            { day: 1, word: "exclude", meanings: ["차단하다", "배제하다"], synonyms: ["keep out", "leave out", "omit"] },
+            { day: 1, word: "mature", meanings: ["성숙해지다"], synonyms: ["get older", "grow up", "age"] },
+            { day: 1, word: "pillar", meanings: ["기둥"], synonyms: ["column", "post", "support"] },
+            { day: 1, word: "encroachment", meanings: ["잠식", "침입"], synonyms: ["invasion", "intrusion", "trespass"] },
+            { day: 1, word: "no wonder", meanings: ["놀랄 일이 아닌"], synonyms: ["unsurprisingly", "unsurprising", "expectedly"] },
+
+            // Day 2
+            { day: 2, word: "virtually", meanings: ["사실상", "거의"], synonyms: ["in effect", "essentially", "almost"] },
+            { day: 2, word: "unprecedented", meanings: ["전례 없는", "새로운"], synonyms: ["unique", "novel", "new"] },
+            { day: 2, word: "grow accustomed to", meanings: ["~에 익숙해지다"], synonyms: ["become used to", "become familiar with"] },
+            { day: 2, word: "intrigue", meanings: ["흥미를 끌다", "음모를 꾸미다"], synonyms: ["interest", "fascinate", "attract"] },
+            { day: 2, word: "implausible", meanings: ["믿기 어려운"], synonyms: ["unlikely", "unbelievable", "improbable"] },
+            { day: 2, word: "decline", meanings: ["쇠퇴", "줄다", "거절하다"], synonyms: ["weakening", "decrease", "refuse"] },
+            { day: 2, word: "contemporary", meanings: ["현대의", "동시대의"], synonyms: ["modern", "current", "coexisting"] },
+            { day: 2, word: "allocate", meanings: ["할당하다", "배정하다"], synonyms: ["distribute", "allot", "designate"] },
+            { day: 2, word: "drastically", meanings: ["극심하게"], synonyms: ["severely", "strikingly", "extremely"] },
+            { day: 2, word: "heterogeneous", meanings: ["잡다한", "혼성의"], synonyms: ["varied", "assorted", "mixed"] },
+            { day: 2, word: "conspicuous", meanings: ["뚜렷한"], synonyms: ["noticeable", "clearly visible", "prominent"] },
+            { day: 2, word: "prolific", meanings: ["다산의", "풍부한"], synonyms: ["fertile", "fruitful", "abundant"] },
+            { day: 2, word: "fluctuation", meanings: ["변동"], synonyms: ["change", "variation", "variance"] },
+            { day: 2, word: "encourage", meanings: ["촉진하다", "격려하다"], synonyms: ["promote", "prompt", "motivate"] },
+            { day: 2, word: "abrupt", meanings: ["갑작스러운", "퉁명스러운"], synonyms: ["sudden", "sharp", "unexpected"] },
+            { day: 2, word: "evaluate", meanings: ["평가하다"], synonyms: ["judge", "assess", "gauge"] },
+            { day: 2, word: "comprehensive", meanings: ["종합적인"], synonyms: ["thorough", "complete", "exhaustive"] },
+            { day: 2, word: "engrave", meanings: ["새기다"], synonyms: ["carve", "incise", "etch"] },
+            { day: 2, word: "slight", meanings: ["하찮은", "경미한"], synonyms: ["minor", "small", "trivial"] },
+            { day: 2, word: "monotonous", meanings: ["단조로운", "지루한"], synonyms: ["unvaried", "boring", "tedious"] },
+            { day: 2, word: "regard", meanings: ["생각하다", "간주하다", "관심"], synonyms: ["consider", "think of", "attention"] },
+            { day: 2, word: "obsession with", meanings: ["~에 대한 집착"], synonyms: ["fixation on", "preoccupation with"] },
+            { day: 2, word: "optimize", meanings: ["최대한 잘 활용하다"], synonyms: ["make the best use of", "enhance"] },
+            { day: 2, word: "supplant", meanings: ["대체하다"], synonyms: ["replace", "substitute", "displace"] },
+            { day: 2, word: "colossal", meanings: ["거대한", "엄청난"], synonyms: ["enormous", "monstrous", "gigantic"] },
+            { day: 2, word: "diffuse", meanings: ["퍼뜨리다"], synonyms: ["spread", "distribute", "scatter"] },
+            { day: 2, word: "mechanics", meanings: ["방법", "원리"], synonyms: ["procedure", "process", "system"] },
+            { day: 2, word: "susceptible to", meanings: ["~에 걸리기 쉬운"], synonyms: ["vulnerable to", "prone to", "likely to get"] },
+            { day: 2, word: "emanate", meanings: ["발산하다", "나다"], synonyms: ["emerge", "spring", "originate"] },
+            { day: 2, word: "conventionally", meanings: ["관례적으로"], synonyms: ["customarily", "traditionally"] },
+            { day: 2, word: "expansive", meanings: ["넓은", "광대한"], synonyms: ["large", "broad", "wide"] },
+            { day: 2, word: "sporadically", meanings: ["이따금씩"], synonyms: ["occasionally", "at intervals", "infrequently"] },
+            { day: 2, word: "comparative", meanings: ["상대적인"], synonyms: ["relative", "proportional"] },
+            { day: 2, word: "stamp out", meanings: ["근절하다"], synonyms: ["eliminate", "eradicate", "extirpate"] },
+            { day: 2, word: "stagnation", meanings: ["침체"], synonyms: ["low growth", "downturn", "inactivity"] },
+            { day: 2, word: "innate", meanings: ["선천적인"], synonyms: ["inborn", "natural", "native"] },
+            { day: 2, word: "obsolete", meanings: ["쓸모없게 된", "구식의"], synonyms: ["out of date", "outdated", "unused"] },
+            { day: 2, word: "specify", meanings: ["명시하다"], synonyms: ["state", "define", "stipulate"] },
+            { day: 2, word: "endure", meanings: ["견디다", "지속하다"], synonyms: ["tolerate", "survive", "last"] },
+            { day: 2, word: "conceivable", meanings: ["생각할 수 있는"], synonyms: ["imaginable", "thinkable", "possible"] },
+            { day: 2, word: "sufficiently", meanings: ["충분히"], synonyms: ["adequately", "amply", "satisfactorily"] },
+            { day: 2, word: "entail", meanings: ["수반하다", "필요로 하다"], synonyms: ["involve", "cause", "require"] },
+            { day: 2, word: "depict", meanings: ["묘사하다"], synonyms: ["picture", "portray", "represent"] },
+            { day: 2, word: "integration", meanings: ["통합"], synonyms: ["union", "unification", "combination"] },
+            { day: 2, word: "stockpile", meanings: ["비축하다"], synonyms: ["store up", "save", "reserve"] },
+            { day: 2, word: "capture", meanings: ["붙잡다"], synonyms: ["seize", "catch", "trap"] },
+            { day: 2, word: "landscape", meanings: ["풍경"], synonyms: ["scenery", "scene", "view"] },
+            { day: 2, word: "elaborately", meanings: ["정교하게"], synonyms: ["with great detail", "intricately"] },
+            { day: 2, word: "autonomous", meanings: ["자율적인"], synonyms: ["independent", "self-determining"] },
+            { day: 2, word: "boom", meanings: ["갑자기 번창하다"], synonyms: ["flourish", "thrive", "prosper"] },
+            { day: 2, word: "supremacy", meanings: ["우위", "최고위"], synonyms: ["dominance", "predominance", "ascendancy"] },
+            { day: 2, word: "ravage", meanings: ["파괴하다"], synonyms: ["destroy", "demolish", "devastate"] },
+            { day: 2, word: "authority", meanings: ["권위자", "대가"], synonyms: ["expert", "master", "specialist"] },
+            { day: 2, word: "plug", meanings: ["메우다", "채우다"], synonyms: ["fill up", "stuff", "pack"] },
+            { day: 2, word: "discrepancy", meanings: ["불일치"], synonyms: ["inconsistency", "disparity", "dissimilarity"] },
+            { day: 2, word: "elucidate", meanings: ["설명하다"], synonyms: ["clarify", "explain", "make clear"] }
+        ];
+
+        let activeDay = 'all';
+        let generatedQuestions = [];
+
+        function renderList() {
+            const container = document.getElementById('word-list-container');
+            const search = document.getElementById('search-input').value.toLowerCase();
+            const hideM = document.getElementById('hide-meaning').checked;
+            const hideS = document.getElementById('hide-synonym').checked;
+
+            container.innerHTML = '';
+
+            const filtered = vocabData.filter(item => {
+                const matchDay = activeDay === 'all' || item.day == activeDay;
+                const matchSearch = item.word.toLowerCase().includes(search) ||
+                                    item.meanings.some(m => m.includes(search)) ||
+                                    item.synonyms.some(s => s.toLowerCase().includes(search));
+                return matchDay && matchSearch;
+            });
+
+            filtered.forEach((item, idx) => {
+                const el = document.createElement('div');
+                el.className = "border border-black p-4 rounded bg-white flex flex-col sm:flex-row justify-between gap-2 sm:items-center";
+                
+                const meaningStr = item.meanings.join(' / ');
+                const synonymStr = item.synonyms.join(', ');
+
+                el.innerHTML = `
+                    <div class="space-y-1">
+                        <div class="flex items-center gap-2">
+                            <span class="font-black text-lg">${item.word}</span>
+                            <span class="text-xs font-bold border border-black px-1.5 py-0.5 rounded">Day ${item.day}</span>
+                        </div>
+                        <div class="text-sm font-semibold text-gray-800 ${hideM ? 'hide-text' : ''}">
+                            뜻: ${meaningStr}
+                        </div>
+                    </div>
+                    <div class="text-xs font-bold text-gray-600 sm:text-right border-t sm:border-t-0 pt-2 sm:pt-0 ${hideS ? 'hide-text' : ''}">
+                        동의어: ${synonymStr}
+                    </div>
+                `;
+                container.appendChild(el);
+            });
+        }
+
+        function filterDay(day) {
+            activeDay = day;
+            document.querySelectorAll('.day-btn').forEach(btn => btn.className = "day-btn px-3 py-2 bg-white text-black font-bold text-xs rounded border border-black cursor-pointer");
+            event.target.className = "day-btn px-3 py-2 bg-black text-white font-bold text-xs rounded border border-black cursor-pointer";
+            renderList();
+        }
+
+        function filterWords() { renderList(); }
+        function toggleMask() { renderList(); }
+
+        function switchTab(tab) {
+            if(tab === 'list') {
+                document.getElementById('tab-list').classList.remove('hidden');
+                document.getElementById('tab-test').classList.add('hidden');
+                document.getElementById('btn-list').className = "flex-1 sm:flex-none px-5 py-2.5 bg-black text-white font-bold rounded border border-black cursor-pointer text-sm";
+                document.getElementById('btn-test').className = "flex-1 sm:flex-none px-5 py-2.5 bg-white text-black font-bold rounded border border-black hover:bg-gray-100 transition cursor-pointer text-sm";
+            } else {
+                document.getElementById('tab-list').classList.add('hidden');
+                document.getElementById('tab-test').classList.remove('hidden');
+                document.getElementById('btn-test').className = "flex-1 sm:flex-none px-5 py-2.5 bg-black text-white font-bold rounded border border-black cursor-pointer text-sm";
+                document.getElementById('btn-list').className = "flex-1 sm:flex-none px-5 py-2.5 bg-white text-black font-bold rounded border border-black hover:bg-gray-100 transition cursor-pointer text-sm";
+            }
+        }
+
+        function generatePaper() {
+            const dayVal = document.querySelector('input[name="test-day"]:checked').value;
+            const countVal = document.querySelector('input[name="test-count"]:checked').value;
+
+            let pool = dayVal === 'all' ? [...vocabData] : vocabData.filter(i => i.day == dayVal);
+            pool.sort(() => Math.random() - 0.5);
+
+            let totalCount = countVal === 'all' ? pool.length : Math.min(parseInt(countVal), pool.length);
+            generatedQuestions = pool.slice(0, totalCount);
+
+            const container = document.getElementById('paper-questions-container');
+            container.innerHTML = '';
+
+            generatedQuestions.forEach((q, qIdx) => {
+                const qBox = document.createElement('div');
+                qBox.className = "border-2 border-black p-4 sm:p-5 rounded space-y-4 bg-gray-50";
+
+                // 1. 단어 한국어 입력 칸 (뜻 개수만큼 분리 생성)
+                let meaningInputsHTML = '';
+                q.meanings.forEach((_, mIdx) => {
+                    meaningInputsHTML += `
+                        <input type="text" name="q_${qIdx}_m_${mIdx}" placeholder="뜻 ${q.meanings.length > 1 ? (mIdx + 1) : ''}" 
+                               class="w-full sm:w-64 px-3 py-2 border-2 border-black rounded text-sm bg-white focus:outline-none">
+                    `;
+                });
+
+                // 2. 동의어 3지선다 선택
+                const correctSyn = q.synonyms[Math.floor(Math.random() * q.synonyms.length)];
+                let otherSyns = [];
+                vocabData.forEach(v => {
+                    v.synonyms.forEach(s => {
+                        if (!q.synonyms.includes(s) && !otherSyns.includes(s)) otherSyns.push(s);
+                    });
+                });
+                otherSyns.sort(() => Math.random() - 0.5);
+                let options = [correctSyn, otherSyns[0], otherSyns[1]].sort(() => Math.random() - 0.5);
+
+                let synOptionsHTML = options.map((opt, oIdx) => `
+                    <label class="flex items-center gap-2 border border-black p-2.5 rounded bg-white cursor-pointer text-sm font-medium">
+                        <input type="radio" name="q_${qIdx}_syn" value="${opt}" class="w-4 h-4">
+                        <span>${opt}</span>
+                    </label>
+                `).join('');
+
+                qBox.innerHTML = `
+                    <div class="flex justify-between items-center border-b border-black pb-2">
+                        <span class="font-black text-lg">${qIdx + 1}. ${q.word}</span>
+                        ${q.meanings.length > 1 ? `<span class="text-xs font-bold text-red-600 bg-red-50 border border-red-600 px-2 py-0.5 rounded">뜻 ${q.meanings.length}개 모두 작성</span>` : ''}
+                    </div>
+
+                    <div class="space-y-2">
+                        <label class="block text-xs font-bold text-gray-700">[1] 한국어 뜻 작성</label>
+                        <div class="flex flex-col sm:flex-row gap-2">
+                            ${meaningInputsHTML}
+                        </div>
+                    </div>
+
+                    <div class="space-y-2">
+                        <label class="block text-xs font-bold text-gray-700">[2] 알맞은 동의어 선택 (3지선다)</label>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                            ${synOptionsHTML}
+                        </div>
+                    </div>
+                `;
+
+                container.appendChild(qBox);
+            });
+
+            document.getElementById('test-setup').classList.add('hidden');
+            document.getElementById('test-paper').classList.remove('hidden');
+            document.getElementById('test-result').classList.add('hidden');
+        }
+
+        // 유연한 한국어 텍스트 정규화 (괄호 내용 제거 옵션 적용)
+        function cleanText(str) {
+            if (!str) return '';
+            return str.replace(/\([^)]*\)/g, '') // 괄호와 안쪽 내용 제거
+                      .replace(/\s+/g, '')       // 공백 제거
+                      .trim().toLowerCase();
+        }
+
+        function submitPaper(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+
+            let totalPointsPossible = 0;
+            let earnedPoints = 0;
+            let resultLogs = [];
+
+            generatedQuestions.forEach((q, qIdx) => {
+                // 뜻 검사 (순서 상관없이 유효한 정답 매칭)
+                let remainingAnswers = q.meanings.map(m => cleanText(m));
+                let correctMeaningCount = 0;
+
+                q.meanings.forEach((_, mIdx) => {
+                    totalPointsPossible += 1;
+                    const userInput = cleanText(formData.get(`q_${qIdx}_m_${mIdx}`));
+
+                    const matchIndex = remainingAnswers.findIndex(ans => ans === userInput);
+                    if (userInput !== '' && matchIndex !== -1) {
+                        earnedPoints += 1;
+                        correctMeaningCount += 1;
+                        remainingAnswers.splice(matchIndex, 1); // 사용한 정답 제외
+                    }
+                });
+
+                // 동의어 검사
+                totalPointsPossible += 1;
+                const userSynChoice = formData.get(`q_${qIdx}_syn`);
+                let synCorrect = false;
+                if (userSynChoice && q.synonyms.includes(userSynChoice)) {
+                    earnedPoints += 1;
+                    synCorrect = true;
+                }
+
+                resultLogs.push(`
+                    <div class="p-2 border-b border-gray-200">
+                        <span class="font-bold">${qIdx + 1}. ${q.word}</span>: 
+                        뜻 맞힌 개수 (${correctMeaningCount}/${q.meanings.length}) | 
+                        동의어 (${synCorrect ? '<span class="text-green-600 font-bold">정답</span>' : '<span class="text-red-600 font-bold">오답</span>'})
+                        <div class="text-xs text-gray-500">정답 뜻: ${q.meanings.join(', ')} | 동의어: ${q.synonyms.join(', ')}</div>
+                    </div>
+                `);
+            });
+
+            const scorePercent = ((earnedPoints / totalPointsPossible) * 100).toFixed(1);
+            document.getElementById('final-score').innerText = `총 ${totalPointsPossible}점 중 ${earnedPoints}점 취득 (${scorePercent}점)`;
+            document.getElementById('result-detail').innerHTML = resultLogs.join('');
+
+            document.getElementById('test-paper').classList.add('hidden');
+            document.getElementById('test-result').classList.remove('hidden');
+        }
+
+        function resetTest() {
+            document.getElementById('test-setup').classList.remove('hidden');
+            document.getElementById('test-paper').classList.add('hidden');
+            document.getElementById('test-result').classList.add('hidden');
+        }
+
+        // 초기 실행
+        renderList();
+    </script>
+</body>
+</html>
